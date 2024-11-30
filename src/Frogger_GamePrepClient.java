@@ -63,6 +63,9 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 	private UpdatePoint updPoint;
 	private int tempScore;
 	
+	//have to save it as a member variable so that I can use it in keypress
+	private PrintWriter out;
+	
 	//GUI variables
 	private Container content;
 	private JLabel frogLabel, bgdLabel, scorekeeperLabel, scoreLabel;
@@ -372,6 +375,13 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 		//set up a server
 		//create a thread (infinite while loop)
 		
+		Socket s = new Socket("localhost", SERVER_PORT);
+		
+		//Initialize data stream to send data out
+		OutputStream outstream = s.getOutputStream();
+		PrintWriter out = new PrintWriter(outstream);
+		
+		
 		//set up listening server (you would need to put this code in your GamePrep constructor)
 		Thread t1 = new Thread ( new Runnable () {
 			public void run ( ) {
@@ -383,25 +393,8 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 						
 						client = new ServerSocket(CLIENT_PORT);
 						while(true) {
+							
 							Socket s2;
-							
-							//============= this is from video ================
-							Socket s = new Socket("localhost", SERVER_PORT);
-							
-							//Initialize data stream to send data out
-							OutputStream outstream = s.getOutputStream();
-							PrintWriter out = new PrintWriter(outstream);
-							
-							/*
-							String command = "GETFROG\n";
-							System.out.print("sending: " + command);
-							out.println(command);
-							out.flush();
-							s.close();
-							Thread.sleep(500);
-							*/
-							
-							//============= this is from video ================
 							
 							try {
 								s2 = client.accept();
@@ -441,11 +434,6 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 		//requests for GET
 		//requests for GETFROG, GETCARS, GETLOGS, STARTGAME, TOGGLECARS / LOGS
 		//set up a communication socket
-		Socket s = new Socket("localhost", SERVER_PORT);
-		
-		//Initialize data stream to send data out
-		OutputStream outstream = s.getOutputStream();
-		PrintWriter out = new PrintWriter(outstream);
 
 		String command = "PLAYER 1 UP\n";
 		System.out.println("Sending: " + command);
@@ -466,8 +454,8 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 		System.out.println("Sending: " + command);
 		out.println(command);
 		out.flush();
-		
-		s.close();
+//		s.close();
+
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -579,6 +567,9 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		
+		String command = null;
+		
 		//get current position
 		int x = frog.getX();
 		int y = frog.getY();
@@ -594,7 +585,10 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 
 			}
 			*/
-			
+			command = "MOVEFROG UP\n";
+			System.out.println("Sending: " + command);
+			out.println(command);
+			out.flush();
 			//MOVEFROG UP
 			
 		} else if ( e.getKeyCode() == KeyEvent.VK_DOWN ) {
@@ -607,6 +601,10 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 				
 			}
 			*/
+			command = "MOVEFROG DOWN\n";
+			System.out.println("Sending: " + command);
+			out.println(command);
+			out.flush();
 			//MOVEFROG DOWN
 
 			
@@ -620,6 +618,10 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 
 			}
 			*/
+			command = "MOVEFROG LEFT\n";
+			System.out.println("Sending: " + command);
+			out.println(command);
+			out.flush();
 			//MOVEFROG LEFT
 			
 		}  else if ( e.getKeyCode() == KeyEvent.VK_RIGHT ) {
@@ -632,6 +634,10 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 
 			}
 			*/
+			command = "MOVEFROG RIGHT\n";
+			System.out.println("Sending: " + command);
+			out.println(command);
+			out.flush();
 			//MOVEFROG RIGHT
 		} 
 		
