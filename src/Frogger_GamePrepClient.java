@@ -366,14 +366,11 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 		
 		KeepMoving();
 		DetectCollision();
-		ConnectandSavetoDB();
-		updateDB(user_input, tempScore);
 		
 		//ESTABLISH A LISTENING SERVER ON THE CLIENT
 		//THAT PASSES OFF TO ClientService (all variables)
 		//set up a server
 		//create a thread (infinite while loop)
-		
 		
 		//set up listening server (you would need to put this code in your GamePrep constructor)
 		Thread t1 = new Thread ( new Runnable () {
@@ -475,7 +472,6 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 	}
-	
 		
 	public static void main(String[] args) throws UnknownHostException, IOException {
 				
@@ -483,109 +479,6 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 		myGame.setVisible(true);
 
 	}
-	
-	String ConnectandSavetoDB() {
-		//declare a connection and sql statement to execute
-		Connection conn = null;
-		
-		user_input = JOptionPane.showInputDialog("Enter name:");
-		
-		if(user_input == "") {
-			System.out.println("use a default name when nothing input");
-			user_input = "Grogu";
-		}
-		try {
-			//load the database driver
-			Class.forName("org.sqlite.JDBC");
-			System.out.print("Frogger DB Loaded");
-			
-			//create connection string and connect to database
-			String dbURL = "jdbc:sqlite:froggerdb.db";
-			conn = DriverManager.getConnection(dbURL);
-		
-			if (conn != null) {
-				System.out.println("connected to database");
-				
-				//show meta data for database
-				DatabaseMetaData db = (DatabaseMetaData) conn.getMetaData();
-				System.out.println("Driver Name: " + db.getDriverName());
-				System.out.println("Driver Version: " + db.getDriverVersion());
-				System.out.println("Product Name: " + db.getDatabaseProductName());
-				System.out.println("Product Version: " + db.getDatabaseProductVersion());
-				
-				//create table using prepared statement
-                String sqlCreateTable = "CREATE TABLE IF NOT EXISTS SCORE_RECORDS " +
-                        "(ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        " NAME TEXT NOT NULL, " +
-                        " SCORE INT NOT NULL )" ;
-
-                try (PreparedStatement pstmtCreateTable = conn.prepareStatement(sqlCreateTable)) {
-                	pstmtCreateTable.executeUpdate();
-                	System.out.println("Table Successfully Created");
-                }
-                
-				//insert data using a prepared statement
-                String sqlInsert = "INSERT INTO SCORE_RECORDS (NAME, SCORE ) VALUES (?, ?)";
-                try (PreparedStatement pstmtInsert = conn.prepareStatement(sqlInsert)) {
-
-                	//execute calls to prepared statement
-                	pstmtInsert.setString(1, user_input);
-                	pstmtInsert.setInt(2, tempScore);
-                	pstmtInsert.executeUpdate();
-                	System.out.println("record inserted");
-                	
-                }
-			}
-			
-			//close connection 
-			conn.close();
-			
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return user_input;
-	}
-	
-	void updateDB(String user_input, int tempScore) {
-		//update data
-		Connection conn = null;
-		
-		try {
-			//load the database driver
-			Class.forName("org.sqlite.JDBC");
-			System.out.print("Frogger DB Loaded");
-			
-			//create connection string and connect to database
-			String dbURL = "jdbc:sqlite:froggerdb.db";
-			conn = DriverManager.getConnection(dbURL);
-		
-			if (conn != null) {
-				System.out.println("connected to database");
-				
-				//show meta data for database
-				DatabaseMetaData db = (DatabaseMetaData) conn.getMetaData();
-				System.out.println("Driver Name: " + db.getDriverName());
-				System.out.println("Driver Version: " + db.getDriverVersion());
-				System.out.println("Product Name: " + db.getDatabaseProductName());
-				System.out.println("Product Version: " + db.getDatabaseProductVersion());
-			
-		        String sqlUpdate = "UPDATE SCORE_RECORDS SET SCORE = ? WHERE NAME = ?";
-		        try (PreparedStatement pstmtUpdate = conn.prepareStatement(sqlUpdate)) {
-		
-		        	pstmtUpdate.setInt(1, tempScore);
-		        	pstmtUpdate.setString(2, user_input);
-		        	pstmtUpdate.executeUpdate();
-		        }
-	        }
-        	conn.close();			
-					
-		} catch (Exception e) {
-			e.printStackTrace();
-		
-		}
-	}
-
 
 	int winPoint() {
 		tempScore = updPoint.getPoint() + 50;
