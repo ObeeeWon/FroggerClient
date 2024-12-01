@@ -1,4 +1,4 @@
-/* SERVER INSTANCE */
+/* CLIENT INSTANCE */
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
@@ -22,13 +22,15 @@ public class ClientService implements Runnable {
 	private Character3 logArrays3[];	
 	
 	//JLabel
-	private JLabel frogLabel;
+	private JLabel frogLabel, scoreLabel;
 	private JLabel carLabels[], carLabels2[], carLabels3[];
 	private JLabel logLabels[], logLabels2[], logLabels3[];
 	
 	//variables to process our incoming socket data
 	private Scanner in;
 	private PrintWriter out;
+	
+	private int tempScore;
 	
 	public ClientService() {}
 	
@@ -113,12 +115,21 @@ public class ClientService implements Runnable {
 			frog.setX(x);
 			frog.setY(y);
 			
-			frogLabel.setLocation(
-					frog.getX(), frog.getY() );
+			frogLabel.setLocation( x, y);
 
 			return;
 			
-		} else if ( command.equals("CARDATA")) {
+		} 
+//		else if (command.equals("SCORE")) {
+//			if( in.hasNextInt()) {
+//				tempScore = in.nextInt();
+//				scoreLabel.setText("score: " + tempScore);
+//				System.out.println("Score updated to" + tempScore);
+//				
+//			}
+//		}
+		 else if ( command.equals("CARDATA")) {
+		
 			
 			int x, y = 0;
 			Boolean moving = true;

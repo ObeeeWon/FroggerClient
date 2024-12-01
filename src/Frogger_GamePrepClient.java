@@ -1,5 +1,4 @@
 /* CLIENT INSTANCE */
-
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
@@ -12,17 +11,9 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-//import java.sql.ResultSet;
-
 import javax.swing.ImageIcon;
-//import javax.swing.JButton; not necessary now
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 
 public class Frogger_GamePrepClient extends JFrame implements KeyListener, ActionListener {
 
@@ -380,6 +371,7 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 		//Initialize data stream to send data out
 		OutputStream outstream = s.getOutputStream();
 		PrintWriter out = new PrintWriter(outstream);
+		this.out = out;
 		
 		
 		//set up listening server (you would need to put this code in your GamePrep constructor)
@@ -399,7 +391,7 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 							try {
 								s2 = client.accept();
 								ClientService myService = new ClientService (s2, 
-										user_input, tempScore,frog, frogLabel, 
+										user_input, tempScore, frog, frogLabel, 
 										carArrays, carArrays2, carArrays3,
 										carLabels, carLabels2, carLabels3,
 										logArrays, logArrays2, logArrays3,
@@ -430,6 +422,7 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 		
 		t1.start( );
 		
+		
 		//Threads 
 		//requests for GET
 		//requests for GETFROG, GETCARS, GETLOGS, STARTGAME, TOGGLECARS / LOGS
@@ -454,12 +447,13 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 		System.out.println("Sending: " + command);
 		out.println(command);
 		out.flush();
-//		s.close();
+		s.close();
 
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 	}
+	
 		
 	public static void main(String[] args) throws UnknownHostException, IOException {
 				
@@ -591,6 +585,7 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 			out.flush();
 			//MOVEFROG UP
 			
+			
 		} else if ( e.getKeyCode() == KeyEvent.VK_DOWN ) {
 			/*
 			y += GameProperties.CHARACTER_STEP;
@@ -639,7 +634,7 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 			out.println(command);
 			out.flush();
 			//MOVEFROG RIGHT
-		} 
+		}
 		
 		//update frog
 		frog.setX(x);
@@ -660,6 +655,14 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 		
 	}
 
+	//update the frog label
+	void updateFrogLabel(int x, int y) {
+		frog.setX(x);
+		frog.setY(y);
+		frogLabel.setLocation(x, y);
+	}
+	
+	
 	//same as destination detection, use .getY() to detect boarder
 	// if frog drop into water
 	void detectAliveOnWater() {
