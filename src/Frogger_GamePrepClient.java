@@ -6,11 +6,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Scanner;
+
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -379,53 +382,57 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 			public void run ( ) {
 				synchronized(this) {
 					
-					ServerSocket client;
-					
 					try {
-						
+						//create socket
+						ServerSocket client;
 						client = new ServerSocket(CLIENT_PORT);
+						System.out.println("=== Connecting: Client ===" + CLIENT_PORT);
+						
 						while(true) {
-							
+							//receive the connection
 							Socket s2;
+							s2 = client.accept();
+							System.out.println("--- Server and Cliend are connected ---");
 							
-							try {
-								s2 = client.accept();
-								ClientService myService = new ClientService (s2, 
-										user_input, tempScore, frog, frogLabel, 
-										carArrays, carArrays2, carArrays3,
-										carLabels, carLabels2, carLabels3,
-										logArrays, logArrays2, logArrays3,
-										logLabels, logLabels2, logLabels3
-										);
-								Thread t2 = new Thread(myService);
-								t2.start();
-									
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
+							//initialize an data stream to receive data
+							//sent back via the socket
+							InputStream inStream = s2.getInputStream();
+							Scanner in = new Scanner(inStream);
+							
+							while(true) {
+								String serverCommand = in.next();
+								System.out.println("serverCommand" + serverCommand);
+								
+								//Load the locationn
+								String location = in.next();
+								
+								//pass the x and y to local variables
+								int ServerSideX = in.nextInt();
+								int ServerSideY = in.nextInt();
+								
+								//UPDATE the location of Frog Grogu
+								frog.setX(ServerSideX);
+								frog.setY(ServerSideY);
+								frogLabel.setLocation(ServerSideX, ServerSideY);
+								System.out.println("---- Client Frog Blink to: " + 
+															ServerSideX + 
+															ServerSideY + " ---- ");
 							}
-							System.out.println("client connected");
-							
 						}
-					
-					
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					System.out.println("Waiting for server responses...");
-
-					
+					System.out.println("==== Waiting for server responses ====");
 				}
+				//s2.close();
 			}
 		});
 		
 		t1.start( );
 		
-		
 		//Threads 
 		//requests for GET
-		//requests for GETFROG, GETCARS, GETLOGS, STARTGAME, TOGGLECARS / LOGS
 		//set up a communication socket
 
 		String command = "PLAYER 1 UP\n";
