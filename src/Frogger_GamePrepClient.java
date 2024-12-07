@@ -70,9 +70,9 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 	//GUI setup
 	public Frogger_GamePrepClient() throws UnknownHostException, IOException {
 		super("Doctor Demo");
-		frog = new Character1(100, 200, 51, 55, "nobgd_grogu.png");
-		bgd = new Character1(0, 0, 1551, 700, "bgd_fullscreen_1.png");
-		scorekeeper = new Character1(200,200,92,55,"scorekeeper.png");
+		frog = new Character1(100, 200, 51, 55, "nobgd_grogu.png", this);
+		bgd = new Character1(0, 0, 1551, 700, "bgd_fullscreen_1.png", this);
+		scorekeeper = new Character1(200,200,92,55,"scorekeeper.png", this);
 		
 //		car = new Character2(0, 0, 100, 57, "nobgd_car.png");
 //		loggie = new Character3(0, 0, 65, 119, "nobg_x-wing.png");
@@ -369,96 +369,143 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 		//set up a server
 		//create a thread (infinite while loop)
 		
-		Socket s = new Socket("localhost", SERVER_PORT);
+//		Socket s = new Socket("localhost", SERVER_PORT);
 		
 		//Initialize data stream to send data out
-		OutputStream outstream = s.getOutputStream();
-		PrintWriter out = new PrintWriter(outstream);
-		this.out = out;
+//		OutputStream outstream = s.getOutputStream();
+//		PrintWriter out = new PrintWriter(outstream);
+//		this.out = out;
 		
+		
+		//set up listening server (you would need to put this code in your GamePrep constructor)
+//		Thread t1 = new Thread ( new Runnable () {
+//			public void run ( ) {
+//				synchronized(this) {
+//					
+//					try {
+//						//create socket
+//						ServerSocket client;
+//						client = new ServerSocket(CLIENT_PORT);
+//						System.out.println("=== Connecting: Client ===" + CLIENT_PORT);
+//						
+//						while(true) {
+//							//receive the connection
+//							Socket s2;
+//							s2 = client.accept();
+//							System.out.println("--- Server and Cliend are connected ---");
+//							
+//							//initialize an data stream to receive data
+//							//sent back via the socket
+//							InputStream inStream = s2.getInputStream();
+//							Scanner in = new Scanner(inStream);
+//							
+//							//keep listening
+////							while(true) {
+//							String serverCommand = in.next();
+//							System.out.println("serverCommand" + serverCommand);
+//							
+//							//pass the x and y to local variables
+//							int ServerSideX = in.nextInt();
+//							int ServerSideY = in.nextInt();
+//							
+//							//UPDATE the location of Frog Grogu
+//							frog.setX(ServerSideX);
+//							frog.setY(ServerSideY);
+//							frogLabel.setLocation(ServerSideX, ServerSideY);
+//							System.out.println("---- Client Frog Blink to: " + 
+//														ServerSideX + 
+//														ServerSideY + " ---- ");
+////							}
+//						}
+//					} catch (IOException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					} finally {
+//						try {
+//							s.close();
+//						} catch (Exception e) {
+//							e.printStackTrace();
+//						}
+//					}
+//					System.out.println("==== Waiting for server responses ====");
+//				}
+//			}
+//		});
+//		
+//		t1.start( );
 		
 		//set up listening server (you would need to put this code in your GamePrep constructor)
 		Thread t1 = new Thread ( new Runnable () {
 			public void run ( ) {
 				synchronized(this) {
 					
+					ServerSocket client;
+					
 					try {
-						//create socket
-						ServerSocket client;
-						client = new ServerSocket(CLIENT_PORT);
-						System.out.println("=== Connecting: Client ===" + CLIENT_PORT);
 						
+						client = new ServerSocket(CLIENT_PORT);
 						while(true) {
-							//receive the connection
 							Socket s2;
-							s2 = client.accept();
-							System.out.println("--- Server and Cliend are connected ---");
-							
-							//initialize an data stream to receive data
-							//sent back via the socket
-							InputStream inStream = s2.getInputStream();
-							Scanner in = new Scanner(inStream);
-							
-							while(true) {
-								String serverCommand = in.next();
-								System.out.println("serverCommand" + serverCommand);
-								
-								//Load the locationn
-								String location = in.next();
-								
-								//pass the x and y to local variables
-								int ServerSideX = in.nextInt();
-								int ServerSideY = in.nextInt();
-								
-								//UPDATE the location of Frog Grogu
-								frog.setX(ServerSideX);
-								frog.setY(ServerSideY);
-								frogLabel.setLocation(ServerSideX, ServerSideY);
-								System.out.println("---- Client Frog Blink to: " + 
-															ServerSideX + 
-															ServerSideY + " ---- ");
+							try {
+								s2 = client.accept();
+								ClientService myService = new ClientService(s2, frog);
+								Thread t2 = new Thread(myService);
+								t2.start();
+									
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
 							}
+							System.out.println("client connected");
+							
 						}
+					
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					System.out.println("==== Waiting for server responses ====");
+					System.out.println("Waiting for server responses...");
+
+					
 				}
-				//s2.close();
 			}
 		});
-		
 		t1.start( );
+
 		
 		//Threads 
 		//requests for GET
 		//set up a communication socket
 
-		String command = "PLAYER 1 UP\n";
-		System.out.println("Sending: " + command);
-		out.println(command);
-		out.flush();
-		
-		command = "PLAYER 1 DOWN\n";
-		System.out.println("Sending: " + command);
-		out.println(command);
-		out.flush();
-		
-		command = "PLAYER 1 LEFT\n";
-		System.out.println("Sending: " + command);
-		out.println(command);
-		out.flush();
-		
-		command = "PLAYER 1 RIGHT\n";
-		System.out.println("Sending: " + command);
-		out.println(command);
-		out.flush();
-		s.close();
+//		String command = "PLAYER 1 UP\n";
+//		System.out.println("Sending: " + command);
+//		out.println(command);
+//		out.flush();
+//		
+//		command = "PLAYER 1 DOWN\n";
+//		System.out.println("Sending: " + command);
+//		out.println(command);
+//		out.flush();
+//		
+//		command = "PLAYER 1 LEFT\n";
+//		System.out.println("Sending: " + command);
+//		out.println(command);
+//		out.flush();
+//		
+//		command = "PLAYER 1 RIGHT\n";
+//		System.out.println("Sending: " + command);
+//		out.println(command);
+//		out.flush();
+////		s2.close();
 
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+	}
+	
+	public void updateFrogLabel() {
+		frogLabel.setLocation(frog.getX(), frog.getY());// Grogu blink!
+		
 	}
 	
 		
@@ -538,6 +585,7 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 		}
 	}
 	
+
 	public void DetectCollision() {
 		
 //		car.detectCollision();
@@ -569,12 +617,27 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 	@Override
 	public void keyPressed(KeyEvent e) {
 		
-		String command = null;
+		//sample code (like in keypressed)
+
+		//set up a communication socket
+		Socket s = null;
+		try {
+			s = new Socket("localhost", SERVER_PORT);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		
-		//get current position
-		int x = frog.getX();
-		int y = frog.getY();
-		
+		//Initialize data stream to send data out
+		OutputStream outstream = null;
+		try {
+			outstream = s.getOutputStream();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		PrintWriter out = new PrintWriter(outstream);
+
 		//detect direction
 		if ( e.getKeyCode() == KeyEvent.VK_UP ) {
 			/*
@@ -586,7 +649,7 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 
 			}
 			*/
-			command = "MOVEFROG UP\n";
+			String command = "MOVEFROG 1 UP\n";//
 			System.out.println("Sending: " + command);
 			out.println(command);
 			out.flush();
@@ -603,7 +666,7 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 				
 			}
 			*/
-			command = "MOVEFROG DOWN\n";
+			String command = "MOVEFROG 1 DOWN\n";
 			System.out.println("Sending: " + command);
 			out.println(command);
 			out.flush();
@@ -620,7 +683,7 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 
 			}
 			*/
-			command = "MOVEFROG LEFT\n";
+			String command = "MOVEFROG 1 LEFT\n";
 			System.out.println("Sending: " + command);
 			out.println(command);
 			out.flush();
@@ -636,22 +699,47 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 
 			}
 			*/
-			command = "MOVEFROG RIGHT\n";
+			String command = "MOVEFROG 1 RIGHT\n";
 			System.out.println("Sending: " + command);
 			out.println(command);
 			out.flush();
 			//MOVEFROG RIGHT
 		}
 		
+		try {
+			s.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+//		String command = "PLAYER 2 UP\n";
+//		System.out.println("Sending: " + command);
+//		out.println(command);
+//		out.flush();
+//		
+//		command = "PLAYER 1 DOWN\n";
+//		System.out.println("Sending: " + command);
+//		out.println(command);
+//		out.flush();
+		
+//		s.close();
+		
+//		String command = null;
+		
+		//get current position
+//		int x = frog.getX();
+//		int y = frog.getY();
+		
+
 		//update frog
-		frog.setX(x);
-		frog.setY(y);
+//		frog.setX(x);
+//		frog.setY(y);
 		
 		
 		//move label
-		frogLabel.setLocation(
-				frog.getX(), frog.getY() );
-		
+//		frogLabel.setLocation(
+//				frog.getX(), frog.getY() );
 		
 		//same as destination detection, use .getY() to detect boarder
 		// if frog drop into water
