@@ -70,9 +70,9 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 	//GUI setup
 	public Frogger_GamePrepClient() throws UnknownHostException, IOException {
 		super("Doctor Demo");
-		frog = new Character1(100, 200, 51, 55, "nobgd_grogu.png", this);
-		bgd = new Character1(0, 0, 1551, 700, "bgd_fullscreen_1.png", this);
-		scorekeeper = new Character1(200,200,92,55,"scorekeeper.png", this);
+		frog = new Character1(100, 200, 51, 55, "nobgd_grogu.png");
+		bgd = new Character1(0, 0, 1551, 700, "bgd_fullscreen_1.png");
+		scorekeeper = new Character1(200,200,92,55,"scorekeeper.png");
 		
 //		car = new Character2(0, 0, 100, 57, "nobgd_car.png");
 //		loggie = new Character3(0, 0, 65, 119, "nobg_x-wing.png");
@@ -448,7 +448,7 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 							Socket s2;
 							try {
 								s2 = client.accept();
-								ClientService myService = new ClientService(s2, frog);
+								ClientService myService = new ClientService(s2, frog, frogLabel);
 								Thread t2 = new Thread(myService);
 								t2.start();
 									
@@ -465,8 +465,6 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 						e.printStackTrace();
 					}
 					System.out.println("Waiting for server responses...");
-
-					
 				}
 			}
 		});
@@ -636,6 +634,7 @@ public class Frogger_GamePrepClient extends JFrame implements KeyListener, Actio
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		
 		PrintWriter out = new PrintWriter(outstream);
 
 		//detect direction

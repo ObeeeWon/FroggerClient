@@ -2,19 +2,23 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
 
+import javax.swing.JLabel;
+
 //processing routine on server (B)
 public class ClientService implements Runnable {
 
 	private Socket s;
 	private Scanner in;
 	private Character1 FrogerGrogu;
-
-	public ClientService (Socket aSocket, Character1 FrogerGrogu) {
+	private JLabel frogLabel;
+	
+	public ClientService (Socket aSocket, Character1 FrogerGrogu, JLabel frogLabel) {
 		this.s = aSocket;
 		this.FrogerGrogu = FrogerGrogu;
+		this.frogLabel = frogLabel;
 		
 	}
-	
+		
 	public void run() {
 		
 		try {
@@ -64,8 +68,22 @@ public class ClientService implements Runnable {
 			FrogerGrogu.setX(playerX);
 			FrogerGrogu.setY(playerY);
 			
-			Frogger_GamePrepClient FrogGameClient = FrogerGrogu.getFrogGameClient();
-			FrogGameClient.updateFrogLabel();
+
+			updateFrogLabel();
+
+		}
+	}
+	
+	public void updateFrogLabel() {
+		if(frogLabel != null){
+		frogLabel.setLocation(FrogerGrogu.getX(), FrogerGrogu.getY());// Grogu blink!
+		} else {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 }
